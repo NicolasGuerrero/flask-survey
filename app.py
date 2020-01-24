@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from surveys import satisfaction_survey as survey
 
@@ -20,10 +20,17 @@ def start_survey():
 
 @app.route("/questions/<int:qid>")
 def ask_question(qid):
-    if qid != len(session[RESPONSES_KEY]):
-        return redirect(f"/questions/{len(session[RESPONSES_KEY])}") 
-    if len(session[RESPONSES_KEY]) == len(survey.questions):
+    print("qid",qid)
+    print("len", len(session[RESPONSES_KEY]))
+    if  len(session[RESPONSES_KEY]) == len(survey.questions):
+        msg = "Survey already completed"
+        # flash(msg)
         return redirect("/complete")
+    if qid != len(session[RESPONSES_KEY]):
+        msg = "Trying to access invalid message"
+        flash(msg)
+        return redirect(f"/questions/{len(session[RESPONSES_KEY])}") 
+
     question = survey.questions[qid].question
     choice_0 = survey.questions[qid].choices[0]
     choice_1 = survey.questions[qid].choices[1]
